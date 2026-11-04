@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>屏幕标注 · 预览</title>
+  <link rel="stylesheet" href="../src/overlay/overlay.css?v=0.1.1" />
+  <style>
+    body {
+      background: #f3f5f9;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="csc-canvas"></canvas>
+  <textarea id="csc-editor" class="csc-editor" spellcheck="false" hidden></textarea>
+  <div id="csc-toast" class="csc-toast" hidden></div>
+  <div id="csc-toolbar" class="csc-toolbar" hidden></div>
+
+  <script src="mock-bridge.js"></script>
+  <script src="../src/shared/ns.js"></script>
+  <script src="../src/shared/defaults.js"></script>
+  <script src="../src/shared/geometry.js"></script>
+  <script src="../src/shared/history.js"></script>
+  <script src="../src/shared/settings.js"></script>
+  <script src="../src/overlay/icons.js"></script>
+  <script src="../src/overlay/render.js"></script>
+  <script src="../src/overlay/toolbar.js"></script>
+  <script src="../src/overlay/overlay.js"></script>
+  <script src="preview.js"></script>
+</body>
+</html>

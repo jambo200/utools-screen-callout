@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>屏幕标注</title>
+  <link rel="stylesheet" href="src/main/main.css?v=0.1.3" />
+</head>
+<body>
+  <div class="app">
+    <header class="masthead">
+      <div class="brand">
+        <img class="brand-mark" src="logo.png" alt="" />
+        <div class="brand-text">
+          <h1>屏幕标注</h1>
+          <p>演讲与培训的实时标注层</p>
+        </div>
+      </div>
+      <div class="masthead-actions">
+        <button id="btn-hotkey" class="chip" title="设置全局快捷键">快捷键未设置</button>
+        <button id="btn-start" class="button primary">开始标注</button>
+      </div>
+    </header>
+
+    <nav class="tabs" role="tablist" aria-label="配置分类">
+      <button class="tab is-active" data-tab="general" role="tab" aria-selected="true">常规</button>
+      <button class="tab" data-tab="toolbar" role="tab" aria-selected="false">工具栏</button>
+      <button class="tab" data-tab="tools" role="tab" aria-selected="false">工具</button>
+      <button class="tab" data-tab="appearance" role="tab" aria-selected="false">外观</button>
+      <button class="tab" data-tab="shortcuts" role="tab" aria-selected="false">快捷键</button>
+      <button class="tab" data-tab="logs" role="tab" aria-selected="false">日志</button>
+      <button class="tab" data-tab="about" role="tab" aria-selected="false">关于</button>
+    </nav>
+
+    <main class="content">
+      <section class="panel is-active" data-panel="general" role="tabpanel">
+        <div class="panel-head">
+          <h2>启动与会话</h2>
+          <p>进入插件默认停在这里；按全局快捷键会直接开始标注。</p>
+        </div>
+
+        <div class="field-row">
+          <div class="field-label">
+            <span>全局快捷键</span>
+            <em>uTools 指令快捷键，用于直接开始标注</em>
+          </div>
+          <div class="field-control">
+            <button id="btn-hotkey-row" class="button small">设置快捷键</button>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field-label">
+            <span>目标屏幕</span>
+            <em>覆盖层出现的位置</em>
+          </div>
+          <div class="field-control">
+            <select id="opt-display"></select>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field-label">
+            <span>退出时清空标注</span>
+            <em>关闭后，同一目标屏下次进入可恢复标注</em>
+          </div>
+          <div class="field-control">
+            <input type="checkbox" id="opt-clear" />
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field-label">
+            <span>启动时隐藏工具栏</span>
+            <em>进入后用 F9 呼出工具栏</em>
+          </div>
+          <div class="field-control">
+            <input type="checkbox" id="opt-hide-toolbar" />
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field-label">
+            <span>默认激活工具</span>
+            <em>开启标注时自动选中；默认不选中任何工具</em>
+          </div>
+          <div class="field-control">
+            <select id="opt-activation-tool"></select>
+          </div>
+        </div>
+
+        <div class="panel-foot">
+          <button id="btn-spike" class="button danger">诊断模式</button>
+        </div>
+      </section>
+
+      <section class="panel" data-panel="toolbar" role="tabpanel">
+        <div class="panel-head">
+          <h2>工具栏布局</h2>
+          <p>拖动排序；主工具条常驻，放不下的工具收进「更多」。</p>
+        </div>
+
+        <div class="toolbar-grid">
+          <div class="toolbar-lists">
+            <div class="list-block">
+              <div class="list-head">
+                <h3>主工具条</h3>
+                <button id="btn-toolbar-reset" class="link">恢复默认</button>
+              </div>
+              <ul class="drag-list" id="primary-list" data-area="primary"></ul>
+            </div>
+            <div class="list-block">
+              <div class="list-head">
+                <h3>更多菜单</h3>
+                <span class="list-hint">拖入主工具条即可常驻</span>
+              </div>
+              <ul class="drag-list" id="secondary-list" data-area="secondary"></ul>
+            </div>
+            <p class="drag-hint">拖动行排序或换区；也可用 Alt + ↑ / ↓ 调整顺序，Alt + ← / → 换区。</p>
+          </div>
+
+          <aside class="preview-block">
+            <div class="preview-head">
+              <h3>实时预览</h3>
+              <label class="inline-check">
+                <input type="checkbox" id="preview-more" checked />
+                <span>显示更多菜单</span>
+              </label>
+            </div>
+            <div class="preview-stage" id="preview-stage"></div>
+            <p class="preview-caption">蓝色为当前工具；拖动左侧列表即时更新。操作按钮固定在工具右侧。</p>
+          </aside>
+        </div>
+      </section>
+
+      <section class="panel" data-panel="tools" role="tabpanel">
+        <div class="panel-head">
+          <h2>工具参数</h2>
+          <p>每个工具的默认值；标注时也可以在工具栏参数条里临时调整。</p>
+        </div>
+        <div id="tool-settings" class="tool-settings"></div>
+      </section>
+
+      <section class="panel" data-panel="appearance" role="tabpanel">
+        <div class="panel-head">
+          <h2>颜色</h2>
+          <p>色板会出现在工具栏参数条中，悬停色块可删除。</p>
+        </div>
+
+        <div class="field-row">
+          <div class="field-label">
+            <span>所有工具使用相同颜色</span>
+            <em>关闭后每个工具记住自己的颜色</em>
+          </div>
+          <div class="field-control">
+            <input type="checkbox" id="opt-shared" />
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field-label">
+            <span>默认颜色</span>
+            <em>新会话的起始颜色</em>
+          </div>
+          <div class="field-control">
+            <input type="color" id="opt-default-color" />
+          </div>
+        </div>
+
+        <div class="sub-head">色板</div>
+        <div class="palette" id="palette"></div>
+        <div class="palette-add">
+          <input type="color" id="palette-new" value="#2f6bff" />
+          <button id="btn-palette-add" class="button small">添加颜色</button>
+          <button id="btn-palette-reset" class="button ghost small">恢复默认</button>
+        </div>
+      </section>
+
+      <section class="panel" data-panel="shortcuts" role="tabpanel">
+        <div class="panel-head">
+          <h2>会话快捷键</h2>
+          <p>点击输入框后按下组合键。工具切换键固定为 Shift + 1~0 / M / E / A。</p>
+        </div>
+
+        <div class="field-row">
+          <div class="field-label"><span>退出标注</span><em>默认 Esc</em></div>
+          <div class="field-control"><input type="text" id="sc-exit" class="key-input" readonly /></div>
+        </div>
+        <div class="field-row">
+          <div class="field-label"><span>隐藏 / 显示工具栏</span><em>默认 F9</em></div>
+          <div class="field-control"><input type="text" id="sc-toggle" class="key-input" readonly /></div>
+        </div>
+        <div class="field-row">
+          <div class="field-label"><span>鼠标穿透</span><em>默认 F10</em></div>
+          <div class="field-control"><input type="text" id="sc-pass" class="key-input" readonly /></div>
+        </div>
+
+        <p class="hint">撤销 Ctrl+Z、重做 Ctrl+Y、清空 Ctrl+Shift+Backspace 为固定快捷键。</p>
+      </section>
+
+      <section class="panel" data-panel="logs" role="tabpanel">
+        <div class="panel-head">
+          <h2>诊断日志</h2>
+          <p>覆盖层运行事件与心跳；用于排查透明窗口、穿透恢复与存活问题。</p>
+        </div>
+
+        <pre class="log" id="log">暂无日志</pre>
+        <div class="log-actions">
+          <button id="btn-log-download" class="button small">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M8 2v8" />
+              <path d="M4.8 7L8 10.2 11.2 7" />
+              <path d="M3 13h10" />
+            </svg>
+            下载日志
+          </button>
+          <button id="btn-log" class="button ghost small">打开目录</button>
+          <span class="log-hint" id="log-hint"></span>
+        </div>
+
+        <div class="sub-head">自检</div>
+        <div class="selftest-row">
+          <button id="btn-selftest" class="button small">运行自检</button>
+          <span class="foot-note">只验证纯逻辑（几何、撤销、配置），不代替 uTools 实机验收。</span>
+        </div>
+        <div class="selftest" id="selftest-result"></div>
+
+        <details class="usage">
+          <summary>使用说明</summary>
+          <ol class="notes">
+            <li>为「屏幕标注」指令配置全局快捷键，按快捷键在鼠标所在屏幕开始标注。</li>
+            <li>选中工具后在画面上拖拽；工具条上方会出现该工具的参数条，可调线型、箭头、字号、透明度等。</li>
+            <li>按 F10 穿透后可直接操作 PPT / 浏览器，再按一次全局快捷键恢复标注。</li>
+            <li>放大镜会短暂隐藏覆盖层截屏，镜片可拖动，滚轮调倍数。</li>
+          </ol>
+        </details>
+      </section>
+
+      <section class="panel" data-panel="about" role="tabpanel">
+        <div class="about-hero">
+          <img class="about-mark" src="logo.png" alt="" />
+          <div class="about-title">
+            <h2>屏幕标注</h2>
+            <p>演讲、培训与远程讲解的实时标注层</p>
+          </div>
+          <span class="about-version">v0.1.0</span>
+        </div>
+
+        <p class="about-lead">
+          按全局快捷键在鼠标所在屏幕打开透明覆盖层，直接在 PPT、浏览器或任意画面上圈画、标注、放大，不打断正在演示的内容。
+        </p>
+
+        <div class="about-grid">
+          <div>
+            <h3>当前能力</h3>
+            <ul class="about-list">
+              <li>12 种工具：选择、箭头、直线、矩形、椭圆、铅笔、荧光笔、文字、序号、聚光灯、放大镜、橡皮擦</li>
+              <li>每个工具独立参数条：线型、箭头、填充、字体、字号、颜色、透明度、倍数</li>
+              <li>F10 鼠标穿透、F9 隐藏工具栏、放大镜截屏、聚光灯单层遮罩</li>
+            </ul>
+          </div>
+          <div>
+            <h3>运行方式</h3>
+            <ul class="about-list">
+              <li>uTools 8.0+，原生 HTML / CSS / JavaScript，无构建步骤</li>
+              <li>配置保存在 utools.dbStorage；标注不写盘、不生成图片</li>
+              <li>进入标注默认不预选工具，可在「常规」指定默认激活工具</li>
+              <li>默认退出清空；可关闭清空以在同一会话、同一屏幕内恢复</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="about-meta">
+          <div>
+            <span>平台</span>
+            <p>Windows 已验证；macOS 代码兼容，待实机验证。</p>
+          </div>
+          <div>
+            <span>版本</span>
+            <p>v0.1.0 · P0 范围</p>
+          </div>
+          <div>
+            <span>诊断</span>
+            <p>在「常规」页进入诊断模式，按 Spike 指引验证运行环境。</p>
+          </div>
+        </div>
+
+        <p class="about-foot">本地运行，不上传标注内容。</p>
+      </section>
+    </main>
+  </div>
+
+  <script src="src/shared/ns.js"></script>
+  <script src="src/shared/defaults.js"></script>
+  <script src="src/shared/geometry.js"></script>
+  <script src="src/shared/history.js"></script>
+  <script src="src/shared/settings.js"></script>
+  <script src="src/shared/selftest.js"></script>
+  <script src="src/overlay/icons.js"></script>
+  <script src="src/main/main.js"></script>
+</body>
+</html>

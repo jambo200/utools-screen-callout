@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>屏幕标注诊断</title>
+  <link rel="stylesheet" href="spike.css" />
+</head>
+<body>
+  <div class="edge"></div>
+  <canvas id="cv"></canvas>
+
+  <div class="banner" id="banner" hidden></div>
+
+  <aside class="panel" id="panel">
+    <header class="panel-head">
+      <div>
+        <h1>覆盖层诊断</h1>
+        <p class="tagline">P0-A Spike · 存活 / 穿透 / 截屏 / 置顶</p>
+      </div>
+      <span class="badge" id="badge">运行中</span>
+    </header>
+
+    <div class="timer" id="timer">00:00:00</div>
+
+    <dl class="info">
+      <div><dt>显示器</dt><dd id="i-display">-</dd></div>
+      <div><dt>窗口尺寸</dt><dd id="i-size">-</dd></div>
+      <div><dt>缩放 / DPR</dt><dd id="i-scale">-</dd></div>
+      <div><dt>光标坐标</dt><dd id="i-cursor">-</dd></div>
+      <div><dt>会话</dt><dd id="i-session" class="mono">-</dd></div>
+      <div><dt>穿透状态</dt><dd id="i-pass">关</dd></div>
+      <div><dt>热键重入</dt><dd id="i-reentry">0 次</dd></div>
+      <div><dt>窗口焦点</dt><dd id="i-focus">-</dd></div>
+      <div class="wide"><dt>日志</dt><dd id="i-log" class="mono ellipsis">-</dd></div>
+    </dl>
+
+    <div class="actions">
+      <button id="btn-pass">穿透测试（20s）</button>
+      <button id="btn-capture">截屏测试</button>
+      <button id="btn-open-log">打开日志目录</button>
+      <button id="btn-exit" class="danger">退出</button>
+    </div>
+
+    <label class="field">
+      <span>输入法测试（S3）</span>
+      <textarea id="ime" rows="2" placeholder="切换中文输入法输入，Enter 提交并写日志"></textarea>
+    </label>
+
+    <section class="block">
+      <div class="block-head">
+        <span>截屏结果（S4）</span>
+        <span class="muted" id="cap-meta">尚未截屏</span>
+      </div>
+      <div class="cap-wrap" id="cap-wrap" hidden>
+        <img id="cap-img" alt="capture" />
+      </div>
+      <p class="tip" id="cap-tip">点“截屏测试”：截图中若出现本面板/准星，说明覆盖层被拍进去了。</p>
+    </section>
+
+    <section class="block">
+      <div class="block-head"><span>事件日志</span></div>
+      <ul class="logs" id="logs"></ul>
+    </section>
+
+    <p class="foot">
+      面板以外区域会拦截鼠标：可点击落点、移动看准星是否对齐。开启穿透后鼠标可操作下层应用，20 秒自动恢复作为安全阀。
+    </p>
+  </aside>
+
+  <script src="spike.js"></script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "main": "index.html",
+  "logo": "logo.png",
+  "preload": "preload.js",
+  "pluginSetting": {
+    "single": true,
+    "height": 640
+  },
+  "features": [
+    {
+      "code": "annotate",
+      "description": "在当前屏幕直接标注、放大，适合演讲与培训",
+      "cmds": ["屏幕标注", "演示标注"],
+      "mainHide": true
+    },
+    {
+      "code": "settings",
+      "description": "屏幕标注的设置与使用引导",
+      "cmds": ["标注设置", "屏幕标注设置"]
+    }
+  ]
+}
