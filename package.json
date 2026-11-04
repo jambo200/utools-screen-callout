@@ -1,6 +1,6 @@
 {
   "name": "utools-screen-callout",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "uTools 屏幕标注插件：演讲/培训场景的实时标注与放大",
   "type": "commonjs",
   "license": "MIT",
@@ -12,6 +12,7 @@
     "presentation"
   ],
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "pack": "node scripts/pack.js"
   }
 }

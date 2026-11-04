@@ -2,7 +2,7 @@
 
 在任意屏幕的实时画面上直接圈画、标注、放大，用于**演讲、培训、演示、远程讲解**等场景。按全局快捷键唤出全屏透明覆盖层与悬浮工具栏，画完即可隐藏或穿透，不打断正在演示的 PPT / 浏览器。
 
-> 当前版本：`v0.1.0`（P0 范围）
+> 当前版本：`v1.0.0`（P0 范围）
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
@@ -90,7 +90,7 @@
 >
 > 如需让插件随 uTools 启动常驻，请在插件右键菜单中**先取消勾选**「退出到后台立即结束运行」，再勾选「跟随主程序同时启动运行」——前者勾选时 uTools 会禁用后者。该选项由 uTools 宿主控制，不属于插件配置。
 
-![uTools 运行设置：跟随主程序同时启动运行](docs/shots/utools-autostart.png)
+![uTools 运行设置：跟随主程序同时启动运行](src/assets/utools-autostart.png)
 
 ---
 
@@ -140,9 +140,11 @@
 ├─ preload.js               # 主桥接：窗口/显示器/截图/存储/IPC
 ├─ overlay-preload.js       # 覆盖层桥接（最小暴露）
 ├─ src/
+│  ├─ assets/               # 运行时图片（引导页配图）
 │  ├─ shared/               # 纯逻辑：默认值、几何、撤销、配置、自检
 │  ├─ main/                 # 配置页样式与控制器
 │  └─ overlay/              # 覆盖层控制器、渲染、工具栏、图标、样式
+├─ scripts/                 # 发布打包脚本（npm run pack）
 ├─ dev/                     # Spike 诊断页 + 浏览器静态预览（mock 桥接）
 ├─ tests/                   # Node 内置测试 + 静态一致性检查
 └─ docs/                    # 功能梳理、实施方案、Spike 指引
@@ -165,6 +167,26 @@ npm test        # node --test：单元测试 + 静态检查
 - `dev/preview.html`：直接看到工具栏、参数条与各类标注的渲染效果；`?arrow=1` 可直接展开线型菜单。
 - `index.html?tab=toolbar` / `?tab=tools`：在普通浏览器里预览配置页某个页签；
 - 兜底说明：预览页只验证页面逻辑与视觉，不验证 uTools 运行时行为。
+
+---
+
+## 发布
+
+uTools 开发者工具「发布新版本」会打包所选文件夹下的全部文件，且不允许包含 `.git` 版本控制文件夹，因此不能直接选仓库根目录。发布前先生成干净的发布目录：
+
+```bash
+npm run pack    # 按白名单生成 release/，并校验配置与页面引用
+```
+
+脚本只复制运行时文件（`plugin.json`、`logo.png`、`index.html`、`overlay.html`、两个 preload 与 `src/`），不会带入 `.git`、`dev/`、`tests/`、`docs/`；校验不通过会以非零退出码结束。`release/` 已加入 `.gitignore`，不纳入版本管理。
+
+随后在 uTools 开发者工具中点击「发布新版本」：
+
+1. 版本号填写与 `package.json` 一致的版本（`npm run pack` 会打印当前版本）；
+2. 点击文件夹图标，把打包目录改选为仓库下的 `release`；
+3. 点击「下一步」。
+
+每次改完代码重新执行 `npm run pack` 再发布，避免 `release/` 残留旧文件。
 
 ---
 

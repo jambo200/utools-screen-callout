@@ -11,6 +11,7 @@ desktop.ini
 # 依赖与本地构建产物
 node_modules/
 npm-debug.log*
+release/
 
 # 本地日志与临时文件
 *.log
