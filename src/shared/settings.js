@@ -312,6 +312,14 @@
     return next;
   }
 
+  function resetAllToolOptions(source) {
+    var next = mergeSettings(source);
+    Object.keys(next.toolOptions).forEach(function (toolId) {
+      next.toolOptions[toolId] = defaults.defaultToolOptions(toolId);
+    });
+    return next;
+  }
+
   function reorderTool(settings, toolId, delta) {
     var next = clone(settings);
     ['primary', 'secondary'].some(function (area) {
@@ -388,6 +396,7 @@
     clone: clone,
     moveTool: moveTool,
     resetToolOptions: resetToolOptions,
+    resetAllToolOptions: resetAllToolOptions,
     reorderTool: reorderTool,
     insertTool: insertTool,
     addPaletteColor: addPaletteColor,

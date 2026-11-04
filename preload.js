@@ -303,7 +303,11 @@ function setPassthrough(on, source) {
   }
   const next = !!on;
   try {
-    win.setIgnoreMouseEvents(next, { forward: true });
+    if (next) {
+      win.setIgnoreMouseEvents(true, { forward: true });
+    } else {
+      win.setIgnoreMouseEvents(false);
+    }
   } catch (err) {
     log('setIgnoreMouseEvents failed: ' + err.message);
   }
@@ -455,6 +459,23 @@ ipcRenderer.on('sc:exit', function () {
 
 ipcRenderer.on('sc:passthrough', function (event, payload) {
   setPassthrough(payload && payload.on, 'overlay-request');
+});
+
+ipcRenderer.on('sc:ignore-mouse', function (event, payload) {
+  const win = state.win;
+  if (!win || win.isDestroyed()) {
+    return;
+  }
+  const ignore = !!(payload && payload.ignore);
+  try {
+    if (ignore) {
+      win.setIgnoreMouseEvents(true, { forward: true });
+    } else {
+      win.setIgnoreMouseEvents(false);
+    }
+  } catch (err) {
+    log('ignore-mouse failed: ' + err.message);
+  }
 });
 
 ipcRenderer.on('sc:capture-source', function (event, payload) {

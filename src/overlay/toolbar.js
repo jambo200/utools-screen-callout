@@ -95,6 +95,7 @@
     var optionRefs = {};
     var undoBtn = null;
     var redoBtn = null;
+    var passthroughBtn = null;
     var moreBtn = null;
     var toastTimer = null;
     var tipTimer = null;
@@ -130,7 +131,8 @@
       actions.appendChild(redoBtn);
       actions.appendChild(makeActionButton('clear', OC.icons.trash, '清空全部'));
       actions.appendChild(makeActionButton('hide', OC.icons.hide, '隐藏工具栏（F9）'));
-      actions.appendChild(makeActionButton('passthrough', OC.icons.mouseOff, '鼠标穿透（F10）'));
+      passthroughBtn = makeActionButton('passthrough', OC.icons.mouseOff, '鼠标穿透（F10）');
+      actions.appendChild(passthroughBtn);
       actions.appendChild(makeActionButton('exit', OC.icons.exit, '退出标注（Esc）', true));
       mainEl.appendChild(actions);
 
@@ -745,6 +747,20 @@
       }
     }
 
+    function setPassthrough(on) {
+      if (!passthroughBtn) {
+        return;
+      }
+      passthroughBtn.classList.toggle('is-active', !!on);
+      passthroughBtn.innerHTML = on ? OC.icons.mouseOn : OC.icons.mouseOff;
+      passthroughBtn.title = on ? '鼠标穿透已开启，点击退出（F10）' : '鼠标穿透（F10）';
+    }
+
+    function containsPoint(x, y) {
+      var rect = host.getBoundingClientRect();
+      return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+    }
+
     function setBusy(busy) {
       host.classList.toggle('csc-busy', !!busy);
     }
@@ -769,6 +785,8 @@
       updateOptions: updateOptions,
       setUndoRedo: setUndoRedo,
       setVisible: setVisible,
+      setPassthrough: setPassthrough,
+      containsPoint: containsPoint,
       isVisible: function () {
         return !host.hidden;
       },

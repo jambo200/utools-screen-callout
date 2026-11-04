@@ -197,6 +197,18 @@ test('默认激活工具只接受 none 或合法工具 id', () => {
   );
 });
 
+test('重置全部工具参数恢复默认值并保留其他配置', () => {
+  const merged = settings.mergeSettings({
+    toolOptions: { arrow: { width: 9 }, text: { fontSize: 40 } },
+    colors: { default: '#123456' }
+  });
+  const reset = settings.resetAllToolOptions(merged);
+  assert.deepStrictEqual(reset.toolOptions, defaults.defaultSettings().toolOptions);
+  assert.strictEqual(reset.colors.default, '#123456');
+  assert.deepStrictEqual(reset.toolbar, merged.toolbar);
+  assert.strictEqual(merged.toolOptions.arrow.width, 9, '不得修改传入配置');
+});
+
 test('重置工具参数只影响指定工具', () => {
   const merged = settings.mergeSettings({
     toolOptions: { arrow: { width: 9, lineStyle: 'dashed' }, pen: { width: 11 } }

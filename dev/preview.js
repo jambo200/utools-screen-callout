@@ -108,6 +108,14 @@
       var params = new URLSearchParams(window.location.search);
       if (params.get('solo')) {
         selectTool(params.get('solo'));
+        if (params.get('passthrough')) {
+          setTimeout(function () {
+            var passBtn = document.querySelector('[data-action="passthrough"]');
+            if (passBtn) {
+              passBtn.click();
+            }
+          }, 120);
+        }
         if (params.get('hidetext')) {
           setTimeout(function () {
             selectTool(params.get('solo'));

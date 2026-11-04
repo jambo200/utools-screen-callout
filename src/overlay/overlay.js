@@ -33,6 +33,8 @@
   var persistTimer = null;
   var toolbarVisible = true;
   var passOn = false;
+  var passHover = false;
+  var lastPointer = { x: -1, y: -1 };
   var pendingCapture = null;
   var toolHintShown = false;
 
@@ -362,6 +364,9 @@
   }
 
   function applyTool(toolId) {
+    if (passOn) {
+      togglePassthrough(false);
+    }
     if (tool === toolId && currentOptions) {
       toolbar.toggleContext();
       return;
@@ -1058,16 +1063,53 @@
 
   function togglePassthrough(force) {
     var next = typeof force === 'boolean' ? force : !passOn;
-    passOn = next;
-    if (next) {
-      toolbarVisible = false;
-      toolbar.setVisible(false);
-    } else {
-      toolbarVisible = true;
-      toolbar.setVisible(true);
+    if (next === passOn) {
+      return;
     }
-    if (bridge) {
-      bridge.setPassthrough(next);
+    passOn = next;
+    toolbarVisible = true;
+    toolbar.setVisible(true);
+    if (toolbar.setPassthrough) {
+      toolbar.setPassthrough(next);
+    }
+
+    if (next) {
+      var overToolbar =
+        lastPointer.x >= 0 &&
+        lastPointer.y >= 0 &&
+        toolbar.containsPoint(lastPointer.x, lastPointer.y);
+      passHover = overToolbar;
+      if (bridge) {
+        bridge.setPassthrough(true);
+        if (overToolbar && bridge.setIgnoreMouse) {
+          bridge.setIgnoreMouse(false);
+        }
+      }
+      toolbar.toast('鼠标穿透已开启 · 点击工具或按 F10 退出');
+    } else {
+      passHover = false;
+      if (bridge) {
+        bridge.setPassthrough(false);
+        if (bridge.setIgnoreMouse) {
+          bridge.setIgnoreMouse(false);
+        }
+      }
+      toolbar.toast('已恢复标注');
+    }
+  }
+
+  function onPassthroughMove(event) {
+    lastPointer = { x: event.clientX, y: event.clientY };
+    if (!passOn || !toolbar) {
+      return;
+    }
+    var over = toolbar.containsPoint(event.clientX, event.clientY);
+    if (over === passHover) {
+      return;
+    }
+    passHover = over;
+    if (bridge && bridge.setIgnoreMouse) {
+      bridge.setIgnoreMouse(!over);
     }
   }
 
@@ -1178,7 +1220,7 @@
         toggleToolbar(false);
         break;
       case 'passthrough':
-        togglePassthrough(true);
+        togglePassthrough();
         break;
       case 'exit':
         exitSession();
@@ -1213,8 +1255,12 @@
     bridge.onInit(handleInit);
     bridge.onRestore(function (payload) {
       passOn = false;
+      passHover = false;
       toolbarVisible = true;
       toolbar.setVisible(true);
+      if (toolbar.setPassthrough) {
+        toolbar.setPassthrough(false);
+      }
       toolbar.closePopovers();
       toolbar.toast('已恢复标注' + (payload && payload.count ? '（第 ' + payload.count + ' 次）' : ''));
       window.focus();
@@ -1223,7 +1269,11 @@
     bridge.onCapture(handleCapture);
     bridge.onPassthrough(function (payload) {
       passOn = !!(payload && payload.on);
+      if (toolbar.setPassthrough) {
+        toolbar.setPassthrough(passOn);
+      }
       if (!passOn) {
+        passHover = false;
         toolbarVisible = true;
         toolbar.setVisible(true);
       }
@@ -1234,6 +1284,7 @@
   function bindEvents() {
     canvas.addEventListener('pointerdown', onPointerDown);
     window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('mousemove', onPassthroughMove, { passive: true });
     window.addEventListener('pointerup', onPointerUp);
     window.addEventListener('wheel', onWheel, { passive: false });
     window.addEventListener('keydown', onKeyDown);

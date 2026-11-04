@@ -38,6 +38,7 @@
     trash: svg('<path d="M4.8 7h14.4"/><path d="M9.2 7V5h5.6v2"/><path d="M7.8 7l.9 13h6.6l.9-13"/>'),
     hide: svg('<path d="M3 3l18 18"/><path d="M10.6 6.2A8.8 8.8 0 0112 6c5.1 0 8.6 4.4 9.1 6-.3.6-1.1 2-2.5 3.4"/><path d="M6.2 7.8C4.4 9.2 3.3 11.1 3 12c.5 1.6 4 6 9 6 1.3 0 2.5-.3 3.6-.8"/>'),
     mouseOff: svg('<rect x="6.4" y="3.4" width="11.2" height="17.2" rx="5.6"/><path d="M12 7v3.6"/><path d="M3 3l18 18"/>'),
+    mouseOn: svg('<rect x="6.4" y="3.4" width="11.2" height="17.2" rx="5.6"/><path d="M12 7v3.6"/><circle cx="12" cy="6.2" r="1.15" fill="currentColor" stroke="none"/>'),
     exit: svg('<path d="M6 6l12 12"/><path d="M18 6L6 18"/>'),
     more: svg('<circle cx="5.4" cy="12" r="1.25" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.25" fill="currentColor" stroke="none"/><circle cx="18.6" cy="12" r="1.25" fill="currentColor" stroke="none"/>'),
     caret: svg('<path d="M7 10l5 5 5-5"/>', { size: 12 }),

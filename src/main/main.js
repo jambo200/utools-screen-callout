@@ -13,6 +13,7 @@
   var logTimer = null;
   var dragState = null;
   var openToolId = 'arrow';
+  var toolsHintTimer = null;
 
   function $(selector) {
     return document.querySelector(selector);
@@ -40,6 +41,19 @@
     if (options && options.palette) {
       renderPalette();
     }
+  }
+
+  function showToolsHint(text) {
+    var hint = $('#tools-hint');
+    if (!hint) {
+      return;
+    }
+    hint.textContent = text;
+    hint.classList.add('is-visible');
+    clearTimeout(toolsHintTimer);
+    toolsHintTimer = setTimeout(function () {
+      hint.classList.remove('is-visible');
+    }, 2400);
   }
 
   /* ------------------------------------------------------------- 状态 */
@@ -676,6 +690,11 @@
       var next = SC.settings.clone(settings);
       next.toolbar = SC.settings.clone(SC.defaults.DEFAULT_SETTINGS.toolbar);
       saveSettings(next, { toolbar: true });
+    });
+    $('#btn-reset-all-tools').addEventListener('click', function () {
+      saveSettings(SC.settings.resetAllToolOptions(settings));
+      renderToolSettings();
+      showToolsHint('已重置全部工具参数');
     });
     $('#preview-more').addEventListener('change', renderPreview);
 

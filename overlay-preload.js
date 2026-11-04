@@ -45,6 +45,9 @@ window.cscBridge = {
   setPassthrough: function (on) {
     utools.sendToParent('sc:passthrough', { on: !!on });
   },
+  setIgnoreMouse: function (ignore) {
+    utools.sendToParent('sc:ignore-mouse', { ignore: !!ignore });
+  },
   capture: function (requestId, srcRect) {
     utools.sendToParent('sc:capture-source', { requestId: requestId, srcRect: srcRect });
   },
