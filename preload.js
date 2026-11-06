@@ -8,8 +8,11 @@ const fs = require('node:fs');
 const path = require('node:path');
 const geometry = require('./src/shared/geometry.js');
 const settingsModule = require('./src/shared/settings.js');
+const compat = require('./src/shared/compat.js');
 
 const SETTINGS_KEY = 'screen-callout.settings.v1';
+// 旧版本 uTools 缺少 8.0 新增 API，记录一次便于排查运行时问题
+const MISSING_APIS = compat.missingApis(utools);
 
 const state = {
   win: null,
@@ -47,15 +50,19 @@ function writeSettings(raw) {
 /* ------------------------------------------------------------------ 日志 */
 
 function logPath() {
-  return path.join(utools.getPluginLocalDataPath(), 'spike.log');
+  const dir = compat.dataDir(utools, path.join);
+  return dir ? path.join(dir, 'spike.log') : null;
 }
 
 function appendLog(line) {
-  try {
-    fs.mkdirSync(path.dirname(logPath()), { recursive: true });
-    fs.appendFileSync(logPath(), line + '\n', 'utf8');
-  } catch (err) {
-    // 日志失败不影响主流程
+  const file = logPath();
+  if (file) {
+    try {
+      fs.mkdirSync(path.dirname(file), { recursive: true });
+      fs.appendFileSync(file, line + '\n', 'utf8');
+    } catch (err) {
+      // 日志失败不影响主流程
+    }
   }
   if (state.win && !state.win.isDestroyed()) {
     try {
@@ -70,9 +77,20 @@ function log(message) {
   appendLog('[' + new Date().toISOString() + '] ' + message);
 }
 
+log(
+  'runtime uTools=' +
+    (compat.appVersion(utools) || 'unknown') +
+    ' missingApis=' +
+    (MISSING_APIS.length ? MISSING_APIS.join(',') : 'none')
+);
+
 function readLogTail(count) {
+  const file = logPath();
+  if (!file) {
+    return [];
+  }
   try {
-    const text = fs.readFileSync(logPath(), 'utf8');
+    const text = fs.readFileSync(file, 'utf8');
     return text.split(/\r?\n/).filter(Boolean).slice(-count);
   } catch (err) {
     return [];
@@ -353,6 +371,9 @@ async function captureForOverlay(requestId, srcRect) {
   log('capture start request=' + requestId + ' display=' + display.id);
 
   try {
+    if (!compat.supportsCaptureDisplay(utools)) {
+      throw new Error('当前 uTools 版本不支持放大镜截屏，请升级到 uTools 8.0 及以上');
+    }
     win.hide();
     await delay(150);
     const captures = await utools.captureDisplay({ displayId: display.id });
@@ -524,8 +545,12 @@ ipcRenderer.on('sc:tool-state', function (event, payload) {
 });
 
 ipcRenderer.on('sc:open-log', function () {
+  const file = logPath();
+  if (!file) {
+    return;
+  }
   try {
-    utools.shellShowItemInFolder(logPath());
+    utools.shellShowItemInFolder(file);
   } catch (err) {
     log('open log folder failed: ' + err.message);
   }
@@ -568,14 +593,22 @@ window.services = {
   getLogPath: logPath,
   readLogTail: readLogTail,
   openLogFolder: function () {
+    const file = logPath();
+    if (!file) {
+      return;
+    }
     try {
-      utools.shellShowItemInFolder(logPath());
+      utools.shellShowItemInFolder(file);
     } catch (err) {
       log('open log folder failed: ' + err.message);
     }
   },
   exportLog: function () {
     try {
+      const file = logPath();
+      if (!file) {
+        return { ok: false, error: '当前环境没有可用的日志目录' };
+      }
       const stamp = new Date();
       const pad = function (value) {
         return value < 10 ? '0' + value : String(value);
@@ -605,7 +638,7 @@ window.services = {
       if (!savePath) {
         return { ok: false, cancelled: true };
       }
-      fs.copyFileSync(logPath(), savePath);
+      fs.copyFileSync(file, savePath);
       return { ok: true, path: savePath };
     } catch (err) {
       log('export log failed: ' + err.message);
